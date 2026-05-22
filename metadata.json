@@ -1,0 +1,6 @@
+{
+  "name": "DevPath",
+  "description": "An interactive software engineering learning roadmap and platform, with guided paths, sandboxes, and progression tracking.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}

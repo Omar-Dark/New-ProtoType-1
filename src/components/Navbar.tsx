@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { Bell, Settings, Search, Code2, ChevronDown, Sun, Moon, Shield, Sliders } from "lucide-react";
+import { Bell, Settings, Search, Code2, ChevronDown, Sun, Moon, Shield, Sliders, Menu, X } from "lucide-react";
 import { motion, AnimatePresence } from "motion/react";
 import type { AppUser, Page } from "../types";
 
@@ -25,6 +25,7 @@ export default function Navbar({ user, activeNav, onNavigate, onLogout, theme, o
   const [showNotifications, setShowNotifications] = useState(false);
   const [showSettings, setShowSettings] = useState(false);
   const [showProfileMenu, setShowProfileMenu] = useState(false);
+  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
 
   const isDark = theme === "dark";
 
@@ -32,18 +33,28 @@ export default function Navbar({ user, activeNav, onNavigate, onLogout, theme, o
     setShowNotifications(!showNotifications);
     setShowSettings(false);
     setShowProfileMenu(false);
+    setIsMobileMenuOpen(false);
   };
 
   const toggleSettings = () => {
     setShowSettings(!showSettings);
     setShowNotifications(false);
     setShowProfileMenu(false);
+    setIsMobileMenuOpen(false);
   };
 
   const toggleProfileMenu = () => {
     setShowProfileMenu(!showProfileMenu);
     setShowNotifications(false);
     setShowSettings(false);
+    setIsMobileMenuOpen(false);
+  };
+
+  const toggleMobileMenu = () => {
+    setIsMobileMenuOpen(!isMobileMenuOpen);
+    setShowNotifications(false);
+    setShowSettings(false);
+    setShowProfileMenu(false);
   };
 
   const notifications = [
@@ -323,7 +334,78 @@ export default function Navbar({ user, activeNav, onNavigate, onLogout, theme, o
             )}
           </AnimatePresence>
         </div>
+
+        {/* Mobile Menu Toggle */}
+        <button
+          onClick={toggleMobileMenu}
+          className="md:hidden w-8 h-8 flex items-center justify-center rounded-lg transition-colors hover:bg-black hover:bg-opacity-5 dark:hover:bg-white dark:hover:bg-opacity-10 cursor-pointer ml-1"
+          style={{ color: isDark ? '#94A3B8' : '#475569' }}
+          aria-label="Toggle Navigation Menu"
+        >
+          {isMobileMenuOpen ? <X size={20} /> : <Menu size={20} />}
+        </button>
+
       </div>
+
+      {/* Mobile Menu Panel */}
+      <AnimatePresence>
+        {isMobileMenuOpen && (
+          <motion.div
+            initial={{ opacity: 0, height: 0 }}
+            animate={{ opacity: 1, height: "auto" }}
+            exit={{ opacity: 0, height: 0 }}
+            style={{
+              position: "absolute",
+              top: "56px", // exactly below the 14px (h-14) navbar
+              left: 0,
+              right: 0,
+              backgroundColor: isDark ? '#101418' : '#FFFFFF',
+              borderBottom: `1px solid ${isDark ? '#1E293B' : '#E2E8F0'}`,
+              boxShadow: '0 10px 25px rgba(0,0,0,0.15)',
+              zIndex: 49,
+              overflow: "hidden"
+            }}
+            className="flex flex-col gap-2 p-4 md:hidden"
+          >
+            {/* Nav Items */}
+            <div className="flex flex-col gap-1">
+              {navItems.map(item => (
+                <button
+                  key={item.label}
+                  onClick={() => {
+                    onNavigate(item.page, item.label);
+                    setIsMobileMenuOpen(false);
+                  }}
+                  className="w-full text-left px-4 py-3 rounded-lg text-sm font-semibold transition-all cursor-pointer flex items-center justify-between"
+                  style={{
+                    backgroundColor: activeNav === item.label ? (isDark ? '#1E293B' : '#EFF6FF') : 'transparent',
+                    color: activeNav === item.label ? (isDark ? '#F8FAFC' : '#2563EB') : (isDark ? '#94A3B8' : '#475569'),
+                  }}
+                >
+                  <span>{item.label}</span>
+                  {activeNav === item.label && (
+                    <span className="w-1.5 h-1.5 rounded-full" style={{ backgroundColor: '#2563EB' }} />
+                  )}
+                </button>
+              ))}
+            </div>
+
+            {/* Admin Controls */}
+            {user?.role === "admin" && (
+              <button
+                onClick={() => {
+                  onNavigate("admin");
+                  setIsMobileMenuOpen(false);
+                }}
+                className="w-full text-left px-4 py-3 rounded-lg text-sm font-bold text-amber-500 hover:bg-amber-500/10 cursor-pointer flex items-center gap-2 border-t mt-2"
+                style={{ borderColor: isDark ? '#1E293B' : '#E2E8F0' }}
+              >
+                <Shield size={14} /> Admin Panel
+              </button>
+            )}
+          </motion.div>
+        )}
+      </AnimatePresence>
     </nav>
   );
 }

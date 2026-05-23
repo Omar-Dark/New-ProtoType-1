@@ -1,6 +1,6 @@
 import express from "express";
 import "dotenv/config";
-import fallbackData from "../src/fallback_data";
+import fallbackData from "./fallback_data";
 
 const app = express();
 app.use(express.json());

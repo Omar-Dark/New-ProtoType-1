@@ -24,7 +24,7 @@ export default function Footer() {
           </div>
 
           {/* Center Links */}
-          <div className="flex items-center gap-6">
+          <div className="flex flex-wrap items-center gap-x-4 gap-y-2 md:gap-6">
             {["Documentation", "Changelog", "Privacy", "Terms", "Discord"].map(link => (
               <a
                 key={link}

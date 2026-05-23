@@ -11,7 +11,7 @@ app.use(express.json());
 const ROADMAP_BASE_URL = "https://roadmap-project-chi.vercel.app/api/v1";
 const API_KEY = process.env.ROADMAP_API_KEY || "e7b12f8bf9c4e92b13a45b0d7c9e1b342fc4d8ff6c2a9a1e3b6d91f7c8a12bcd";
 
-import fallbackData from "./src/fallback_data.json";
+import fallbackData from "./src/fallback_data";
 
 // ---------------- API ENDPOINTS WITH ROBUST RESILIENT FALLBACKS ----------------
 

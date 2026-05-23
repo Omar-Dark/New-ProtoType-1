@@ -1,4 +1,4 @@
-{
+export const fallbackData = {
   "roadmaps": [
     {
       "_id": "69cfe06b1eafd6cbbe62b455",
@@ -854,4 +854,6 @@
       "desc": "Verify security best-practices by writing a standalone authentication broker with Redis cookie revocations."
     }
   ]
-}
+};
+
+export default fallbackData;

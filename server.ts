@@ -1,6 +1,5 @@
 import express from "express";
 import path from "path";
-import fs from "fs";
 import { createServer as createViteServer } from "vite";
 import "dotenv/config";
 
@@ -12,14 +11,7 @@ app.use(express.json());
 const ROADMAP_BASE_URL = "https://roadmap-project-chi.vercel.app/api/v1";
 const API_KEY = process.env.ROADMAP_API_KEY || "e7b12f8bf9c4e92b13a45b0d7c9e1b342fc4d8ff6c2a9a1e3b6d91f7c8a12bcd";
 
-// Safely load local fallback data from JSON
-let fallbackData: any = { roadmaps: [], quizzes: [], projects: [] };
-try {
-  const fileContent = fs.readFileSync(path.resolve(process.cwd(), "src/fallback_data.json"), "utf8");
-  fallbackData = JSON.parse(fileContent);
-} catch (err: any) {
-  console.error("Warning: Could not read fallback_data.json, using basic empty fallbacks", err.message);
-}
+import fallbackData from "./src/fallback_data.json";
 
 // ---------------- API ENDPOINTS WITH ROBUST RESILIENT FALLBACKS ----------------
 
@@ -159,4 +151,8 @@ async function startServer() {
   });
 }
 
-startServer();
+if (!process.env.VERCEL) {
+  startServer();
+}
+
+export default app;

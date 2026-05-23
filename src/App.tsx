@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import AuthPage from "./components/AuthPage";
 import Dashboard from "./components/Dashboard";
 import RoadmapPage from "./components/RoadmapPage";
@@ -10,21 +10,85 @@ import GeminiChat from "./components/GeminiChat";
 import type { AppUser, Page } from "./types";
 
 export default function App() {
-  const [currentPage, setCurrentPage] = useState<Page>("auth");
-  const [currentUser, setCurrentUser] = useState<AppUser | null>(null);
-  const [activeNav, setActiveNav] = useState<string>("Home");
-  const [theme, setTheme] = useState<"dark" | "light">("dark");
+  const [currentUser, setCurrentUser] = useState<AppUser | null>(() => {
+    try {
+      if (typeof window !== "undefined") {
+        const savedUser = localStorage.getItem("roadmap_user");
+        return savedUser ? JSON.parse(savedUser) : null;
+      }
+    } catch {}
+    return null;
+  });
+
+  const [currentPage, setCurrentPage] = useState<Page>(() => {
+    try {
+      if (typeof window !== "undefined") {
+        const savedPage = localStorage.getItem("roadmap_page");
+        const savedUser = localStorage.getItem("roadmap_user");
+        if (!savedUser) return "auth";
+        return (savedPage as Page) || "auth";
+      }
+    } catch {}
+    return "auth";
+  });
+
+  const [activeNav, setActiveNav] = useState<string>(() => {
+    try {
+      if (typeof window !== "undefined") {
+        const savedNav = localStorage.getItem("roadmap_active_nav");
+        return savedNav || "Home";
+      }
+    } catch {}
+    return "Home";
+  });
+
+  const [theme, setTheme] = useState<"dark" | "light">(() => {
+    try {
+      if (typeof window !== "undefined") {
+        const savedTheme = localStorage.getItem("roadmap_theme");
+        return (savedTheme as "dark" | "light") || "dark";
+      }
+    } catch {}
+    return "dark";
+  });
+
+  useEffect(() => {
+    try {
+      if (currentUser) {
+        localStorage.setItem("roadmap_user", JSON.stringify(currentUser));
+      } else {
+        localStorage.removeItem("roadmap_user");
+      }
+    } catch {}
+  }, [currentUser]);
+
+  useEffect(() => {
+    try {
+      localStorage.setItem("roadmap_page", currentPage);
+    } catch {}
+  }, [currentPage]);
+
+  useEffect(() => {
+    try {
+      localStorage.setItem("roadmap_active_nav", activeNav);
+    } catch {}
+  }, [activeNav]);
+
+  useEffect(() => {
+    try {
+      localStorage.setItem("roadmap_theme", theme);
+      if (theme === "light") {
+        document.documentElement.classList.add("light");
+        document.documentElement.classList.remove("dark");
+      } else {
+        document.documentElement.classList.add("dark");
+        document.documentElement.classList.remove("light");
+      }
+    } catch {}
+  }, [theme]);
 
   const toggleTheme = () => {
-    const nextTheme = theme === "dark" ? "light" : "dark";
-    setTheme(nextTheme);
-    if (nextTheme === "light") {
-      document.documentElement.classList.add("light");
-      document.documentElement.classList.remove("dark");
-    } else {
-      document.documentElement.classList.add("dark");
-      document.documentElement.classList.remove("light");
-    }
+    setTheme(prev => (prev === "dark" ? "light" : "dark"));
   };
 
   const handleLogin = (user: AppUser) => {
@@ -51,6 +115,11 @@ export default function App() {
     setCurrentUser(null);
     setCurrentPage("auth");
     setActiveNav("Home");
+    try {
+      localStorage.removeItem("roadmap_user");
+      localStorage.removeItem("roadmap_page");
+      localStorage.removeItem("roadmap_active_nav");
+    } catch {}
   };
 
   const handleNavigate = (page: Page, nav?: string) => {
